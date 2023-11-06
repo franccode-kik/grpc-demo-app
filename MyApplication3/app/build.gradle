@@ -28,12 +28,26 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
+
 protobuf {
-    protoc { artifact = 'com.google.protobuf:protoc:3.12.0' }
+    protoc {
+        if (osdetector.os == "osx") {
+            artifact = 'com.google.protobuf:protoc:3.14.0:osx-x86_64'
+        } else {
+            artifact = 'com.google.protobuf:protoc:3.14.0'
+        }
+    }
     plugins {
         grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.35.0'
+            if (osdetector.os == "osx") {
+                artifact = 'io.grpc:protoc-gen-grpc-java:1.35.0:osx-x86_64'
+            } else {
+                artifact = 'io.grpc:protoc-gen-grpc-java:1.35.0'
+            }
         }
     }
     generateProtoTasks {
@@ -61,6 +75,8 @@ dependencies {
     implementation 'io.grpc:grpc-protobuf-lite:1.35.0'
     implementation 'io.grpc:grpc-stub:1.35.0'
     implementation 'org.apache.tomcat:annotations-api:6.0.53'
+    implementation 'androidx.navigation:navigation-fragment:2.5.3'
+    implementation 'androidx.navigation:navigation-ui:2.5.3'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

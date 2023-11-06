@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         submitButton = (Button) findViewById(R.id.submit);
 
-        TextView resultText = (TextView) findViewById(R.id.message1);
+        // TextView resultText = (TextView) findViewById(R.id.message1);
         //  resultText.setMovementMethod(new ScrollingMovementMethod());
 
         mChannel = ManagedChannelBuilder.forAddress(HOST, PORT).usePlaintext();
@@ -94,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
         StreamObserver streamObserver = new StreamObserver<UserBulkLoadResponse>() {
             @Override
             public void onNext(UserBulkLoadResponse value) {
-
                 Log.println(Log.VERBOSE,"Info",value.getCreatedUsersList().toString());
             }
 
@@ -102,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
             public void onError(Throwable t) {
                 Log.println(Log.ERROR,"Error","Error en la llamada ");
                 t.printStackTrace();
-
             }
 
             @Override
