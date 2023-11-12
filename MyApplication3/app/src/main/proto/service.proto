@@ -25,6 +25,16 @@ message User {
 message CreatedUser {
   int64 id = 1;
   string username = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string email = 5;
+  string phone = 6;
+  google.protobuf.Timestamp birthDate = 7;
+  string country = 8;
+  string city = 9;
+  string state = 10;
+  string address = 11;
+  string postalCode = 12;
 }
 
 message UserBulkLoadRequest {
@@ -34,6 +44,8 @@ message UserBulkLoadRequest {
 message UserBulkLoadResponse {
   repeated CreatedUser createdUsers = 1;
 }
+
+message EmptyRequest {}
 
 service UserService {
   rpc bulkLoad(UserBulkLoadRequest) returns(UserBulkLoadResponse);
