@@ -1,7 +1,9 @@
 package com.example.myapplication;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +27,9 @@ import com.google.protobuf.Timestamp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
@@ -141,14 +146,9 @@ public class MainActivity extends AppCompatActivity {
                     //El hilo se aplica para que sea mas presentable y entendible para la demo , en futuros proyectos se puede quitar
                     @Override
                     public void run() {
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                createdUserAdapter.addAll(value.getCreatedUsersList());
-                            }
-                        }, 1000);
-
+                        createdUserAdapter.addAll(value.getCreatedUsersList());
+                        createdUserAdapter.notifyDataSetChanged();
+                        createdUserAdapter.notifyDataSetInvalidated();
                     }
                 });
 
@@ -210,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNext(UserBulkLoadResponse value) {
                 Log.println(Log.VERBOSE, "Next", value.toString());
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -233,14 +234,35 @@ public class MainActivity extends AppCompatActivity {
         StreamObserver<User> observerUsers = userServiceStub.bulkLoadClientStream(streamObserver);
 
 
-        for (User user : request.getUsersList()) {
-            Log.println(Log.VERBOSE, "Next", user.toString());
-            userAdapter.add(user);
-            userAdapter.notifyDataSetChanged();
-            observerUsers.onNext(user);
-        }
+//        for (User user : request.getUsersList()) {
+//            Log.println(Log.VERBOSE, "Next", user.toString());
+//            userAdapter.add(user);
+//            userAdapter.notifyDataSetChanged();
+//            observerUsers.onNext(user);
+//        }
 
-        observerUsers.onCompleted();
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        observerUsers.onNext(request.getUsers(0));
+                        userAdapter.add(request.getUsers(0));
+                        if(userAdapter.getCount() == 5){
+                            timer.cancel();
+                            observerUsers.onCompleted();
+                        }
+                    }
+                });
+
+            }
+        };
+
+        timer.schedule(task, 0, 1000);
+
+
     }
 
 
@@ -254,16 +276,8 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                createdUserAdapter.add(value);
-                                createdUserAdapter.notifyDataSetChanged();
-                                createdUserAdapter.notifyDataSetChanged();
-
-                            }
-                        }, 1000);
+                        createdUserAdapter.add(value);
+                        createdUserAdapter.notifyDataSetChanged();
                     }
                 });
             }
@@ -281,16 +295,26 @@ public class MainActivity extends AppCompatActivity {
         };
         StreamObserver<User> observerUsers = userServiceStub.bulkLoadBidirectionalStream(streamObserver);
 
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        observerUsers.onNext(request.getUsers(0));
+                        userAdapter.add(request.getUsers(0));
+                        if(userAdapter.getCount() == 5){
+                            timer.cancel();
+                            observerUsers.onCompleted();
+                        }
+                    }
+                });
 
-        for (User user : request.getUsersList()) {
+            }
+        };
 
-            Log.println(Log.VERBOSE, "Next", user.toString());
-            userAdapter.add(user);
-            userAdapter.notifyDataSetInvalidated();
-            observerUsers.onNext(user);
-        }
-
-        observerUsers.onCompleted();
+        timer.schedule(task, 0, 1000);
     }
 
     public static UserBulkLoadRequest generateBulkLoadGrpcRequest(int numUsers) {
