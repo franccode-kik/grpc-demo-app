@@ -5,13 +5,6 @@
 
     android:background="@color/blueOpen">
 
-    <ImageView
-        android:layout_width="500dp"
-        android:layout_height="125dp"
-        android:layout_gravity="center"
-        android:paddingTop="50dp"
-        android:src="@drawable/openbank_grupo_santader" />
-
     <RadioGroup
         android:id="@+id/myRadioGroup"
         android:layout_width="match_parent"
@@ -104,10 +97,6 @@
                 android:gravity="center">
                 >
 
-                <ImageView
-                    android:layout_width="105dp"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/anagrama_blanco" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -137,11 +126,6 @@
                 android:layout_centerHorizontal="true"
                 android:gravity="center">
                 >
-
-                <ImageView
-                    android:layout_width="105dp"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/anagrama_blanco" />
 
                 <TextView
                     android:layout_width="wrap_content"
