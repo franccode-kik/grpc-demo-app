@@ -22,7 +22,6 @@ import com.drathveloper.grpc.UserBulkLoadResponse;
 import com.drathveloper.grpc.UserServiceGrpc;
 import com.example.myapplication.arrayadapter.CreatedUserAdapter;
 import com.example.myapplication.arrayadapter.UserAdapter;
-import com.example.myapplication.repository.UserApiRepository;
 import com.google.protobuf.Timestamp;
 
 import java.util.ArrayList;
@@ -53,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     EditText messageEdit;
     TextView resultText;
     Button submitButton;
-    UserApiRepository userApiRepository;
 
     UserAdapter userAdapter;
     CreatedUserAdapter createdUserAdapter;
@@ -233,14 +231,6 @@ public class MainActivity extends AppCompatActivity {
         };
         StreamObserver<User> observerUsers = userServiceStub.bulkLoadClientStream(streamObserver);
 
-
-//        for (User user : request.getUsersList()) {
-//            Log.println(Log.VERBOSE, "Next", user.toString());
-//            userAdapter.add(user);
-//            userAdapter.notifyDataSetChanged();
-//            observerUsers.onNext(user);
-//        }
-
         final Handler handler = new Handler();
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
@@ -248,8 +238,8 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 handler.post(new Runnable() {
                     public void run() {
-                        observerUsers.onNext(request.getUsers(0));
-                        userAdapter.add(request.getUsers(0));
+                        observerUsers.onNext(request.getUsers(userAdapter.getCount()));
+                        userAdapter.add(request.getUsers(userAdapter.getCount()));
                         if(userAdapter.getCount() == 5){
                             timer.cancel();
                             observerUsers.onCompleted();
@@ -302,8 +292,8 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 handler.post(new Runnable() {
                     public void run() {
-                        observerUsers.onNext(request.getUsers(0));
-                        userAdapter.add(request.getUsers(0));
+                        observerUsers.onNext(request.getUsers(userAdapter.getCount()));
+                        userAdapter.add(request.getUsers(userAdapter.getCount()));
                         if(userAdapter.getCount() == 5){
                             timer.cancel();
                             observerUsers.onCompleted();
